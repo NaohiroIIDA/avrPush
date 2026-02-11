@@ -5,6 +5,7 @@ import subprocess
 import threading
 import queue
 import os
+import re
 
 
 class AvrPushApp:
@@ -19,6 +20,9 @@ class AvrPushApp:
 
         # 実行中フラグ
         self.is_running = False
+
+        # ファイル名マッピング（表示名 -> 実際のファイル名）
+        self.filename_map = {}
 
         # UI構築
         self.create_widgets()
@@ -123,6 +127,7 @@ class AvrPushApp:
         """firmwareフォルダー内のファイルを取得してリストボックスを更新"""
         try:
             self.file_listbox.delete(0, tk.END)
+            self.filename_map.clear()
 
             current_dir = os.path.dirname(os.path.abspath(__file__))
             firmware_dir = os.path.join(current_dir, "firmware")
@@ -134,8 +139,20 @@ class AvrPushApp:
 
             files = [f for f in os.listdir(firmware_dir) if os.path.isfile(os.path.join(firmware_dir, f))]
 
+            # ファイル名のパターン: IDxx_firm.hex -> IDxx
+            pattern = re.compile(r'^(ID\d+)_firm\.hex$', re.IGNORECASE)
+
             for file in sorted(files):
-                self.file_listbox.insert(tk.END, file)
+                match = pattern.match(file)
+                if match:
+                    # パターンに一致する場合は整形した表示名を使用
+                    display_name = match.group(1)
+                    self.filename_map[display_name] = file
+                    self.file_listbox.insert(tk.END, display_name)
+                else:
+                    # パターンに一致しない場合はそのまま表示
+                    self.filename_map[file] = file
+                    self.file_listbox.insert(tk.END, file)
 
             self.update_terminal(f"firmwareフォルダー内に{len(files)}個のファイルを検出しました。\n")
         except Exception as e:
@@ -160,7 +177,10 @@ class AvrPushApp:
             messagebox.showerror("エラー", "ファームウェアファイルを選択してください。")
             return
 
-        firmware_file = self.file_listbox.get(selection[0])
+        display_name = self.file_listbox.get(selection[0])
+
+        # 表示名から実際のファイル名を取得
+        firmware_file = self.filename_map.get(display_name, display_name)
 
         # ターミナルクリア
         self.terminal_text.config(state=tk.NORMAL)
@@ -170,7 +190,10 @@ class AvrPushApp:
         # 実行情報表示
         self.update_terminal(f"=== AVR書き込み開始 ===\n")
         self.update_terminal(f"COMポート: {com_port}\n")
-        self.update_terminal(f"ファームウェア: {firmware_file}\n")
+        if display_name != firmware_file:
+            self.update_terminal(f"選択: {display_name} ({firmware_file})\n")
+        else:
+            self.update_terminal(f"ファームウェア: {firmware_file}\n")
         self.update_terminal(f"{'=' * 40}\n\n")
 
         # UIロック
