@@ -29,7 +29,7 @@ pip install -r requirements.txt
 
 ```
 avrPush/
-├── main.py
+├── avrPush.py
 ├── firmware/          ← ここにファームウェアファイルを配置
 │   ├── program1.hex
 │   └── program2.hex
@@ -39,7 +39,7 @@ avrPush/
 
 ### 3. avrdude.exeの配置
 
-avrdude.exeを本プログラム（main.py）と同じディレクトリに配置してください。
+avrdude.exeを本プログラム（avrPush.py）と同じディレクトリに配置してください。
 
 avrdudeは以下から入手できます:
 - Arduino IDEに同梱されています
@@ -47,7 +47,7 @@ avrdudeは以下から入手できます:
 
 ### 4. 設定の調整（必要に応じて）
 
-[main.py](main.py) の `execute_avrdude` メソッド内で、使用する環境に合わせてavrdudeのパラメータを変更してください。
+[avrPush.py](avrPush.py) の `execute_avrdude` メソッド内で、使用する環境に合わせてavrdudeのパラメータを変更してください。
 
 ```python
 cmd = [
@@ -64,7 +64,7 @@ cmd = [
 ### 1. アプリケーションの起動
 
 ```bash
-python main.py
+python avrPush.py
 ```
 
 ### 2. COMポートの選択
@@ -108,7 +108,7 @@ python main.py
 
 - 正しいCOMポートを選択しているか確認してください
 - マイコンの種類やプログラマの設定が正しいか確認してください
-- [main.py:149-157](main.py#L149-L157) のavrdudeコマンドパラメータを環境に合わせて変更してください
+- [avrPush.py:149-157](avrPush.py#L149-L157) のavrdudeコマンドパラメータを環境に合わせて変更してください
 
 ## avrdudeパラメータの例
 
