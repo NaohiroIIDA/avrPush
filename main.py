@@ -92,11 +92,18 @@ class AvrPushApp:
         terminal_frame = ttk.LabelFrame(main_frame, text="実行結果", padding="5")
         terminal_frame.grid(row=3, column=0, sticky=(tk.W, tk.E, tk.N, tk.S), pady=5)
         terminal_frame.columnconfigure(0, weight=1)
-        terminal_frame.rowconfigure(0, weight=1)
+        terminal_frame.rowconfigure(1, weight=1)
+
+        # クリアボタン（右上に配置）
+        clear_button_frame = ttk.Frame(terminal_frame)
+        clear_button_frame.grid(row=0, column=0, sticky=tk.E, pady=(0, 5))
+
+        self.clear_terminal_button = ttk.Button(clear_button_frame, text="クリア", command=self.clear_terminal, width=8)
+        self.clear_terminal_button.pack()
 
         # テキストウィジェットとスクロールバー
         text_frame = ttk.Frame(terminal_frame)
-        text_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        text_frame.grid(row=1, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
         text_frame.columnconfigure(0, weight=1)
         text_frame.rowconfigure(0, weight=1)
 
@@ -227,10 +234,12 @@ class AvrPushApp:
             # 以下は一般的なArduino用の設定例
             cmd = [
                 avrdude_path,
-                "-c", "arduino",  # プログラマタイプ（要調整）
+                "-c", "serialupdi",  # プログラマタイプ（要調整）
                 "-P", com_port,
-                "-p", "atmega328p",  # マイコンタイプ（要調整）
-                "-U", f"flash:w:{firmware_path}:i"
+                "-p", "t1616",  # マイコンタイプ（要調整）
+                "-b", "57600",  # ボーレート
+                "-U", f"flash:w:{firmware_path}:i",
+                "-V"
             ]
 
             self.output_queue.put(f"実行コマンド:\n{' '.join(cmd)}\n\n")
@@ -278,6 +287,12 @@ class AvrPushApp:
         self.terminal_text.config(state=tk.NORMAL)
         self.terminal_text.insert(tk.END, text)
         self.terminal_text.see(tk.END)
+        self.terminal_text.config(state=tk.DISABLED)
+
+    def clear_terminal(self):
+        """ターミナルの内容をクリア"""
+        self.terminal_text.config(state=tk.NORMAL)
+        self.terminal_text.delete(1.0, tk.END)
         self.terminal_text.config(state=tk.DISABLED)
 
     def process_output_queue(self):
