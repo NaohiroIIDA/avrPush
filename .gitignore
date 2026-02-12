@@ -45,3 +45,6 @@ avrdude.conf
 
 # Logs
 *.log
+
+# PyInstaller
+*.spec

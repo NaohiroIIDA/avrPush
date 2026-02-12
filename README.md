@@ -129,6 +129,48 @@ avrdude -c usbasp -P usb -p atmega328p -U flash:w:firmware.hex:i
 
 詳細はavrdudeのドキュメントを参照してください。
 
+## EXE化（配布用）
+
+Pythonがインストールされていない環境でも実行できるように、Windows実行ファイル（.exe）に変換できます。
+
+### 手順
+
+1. **PyInstallerのインストール**
+```bash
+pip install pyinstaller
+```
+
+2. **EXE化の実行**
+```bash
+pyinstaller --onefile --windowed --name=avrPush avrPush.py
+```
+
+3. **生成されたファイル**
+```
+dist/
+└── avrPush.exe  ← 実行ファイル
+```
+
+### オプション説明
+- `--onefile`: 全てを1つのexeファイルにまとめる
+- `--windowed`: コンソールウィンドウを表示しない（GUI専用）
+- `--name=avrPush`: 出力ファイル名を指定
+
+### 配布方法
+
+配布する際は、以下のファイル/フォルダーをまとめて配布してください：
+
+```
+配布フォルダ/
+├── avrPush.exe      ← 生成されたexe
+├── avrdude.exe      ← 必須
+├── avrdude.conf     ← avrdudeの設定（必要に応じて）
+└── firmware/        ← ファームウェアフォルダー
+    └── (空でOK)
+```
+
+**注意**: avrPush.exeは単体では動作しません。avrdude.exeが同じフォルダーに必要です。
+
 ## ライセンス
 
 このプロジェクトはオープンソースです。自由に使用、改変できます。
